@@ -2,6 +2,10 @@
   "name": "fetchthemweb",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "npm": "^9.6.6",
+    "node": "^18.16.0"
+  },
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
