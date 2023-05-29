@@ -164,6 +164,9 @@ function setMainPage() {
 
         localStorage.setItem("feeds", JSON.stringify(feeds_json))
 
+        //Updates current NavBar
+        setNavbarTitles()
+
     })
 
     document.getElementById("export-feed-btn").addEventListener("click", () => {
@@ -187,6 +190,8 @@ function setMainPage() {
         if (e.target.files[0]) {
           jsonString = await e.target.files[0].text();
           localStorage.setItem("feeds", jsonString)
+          
+          //Updates current NavBar
           setNavbarTitles()
         }
       });
