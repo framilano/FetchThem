@@ -1,15 +1,16 @@
 const { getLinkPreview, getPreviewFromContent } = require("link-preview-js");
 const { XMLParser } = require("fast-xml-parser");
 
-
+const MAX_ARTICLES = 32
+//XML Parser
+const options = {
+    ignoreAttributes: false
+};
+const parser = new XMLParser(options);
 async function parseLinkPreviewAndSendResult(link) {
     console.debug("[parseLinkPreviewAndSendResult START] [link = %s]", link)
     
-    //XML Parser
-    options = {
-        ignoreAttributes: false
-    };
-    parser = new XMLParser(options);
+    
 
     res = await fetch(link)
 
@@ -28,12 +29,13 @@ async function parseLinkPreviewAndSendResult(link) {
             try {
                 articlePreviews.push(await getLinkPreview(article.link))
             } catch {
+                console.error("[parseLinkPreviewAndSendResult ERROR] [Couldn't retrieve %s preview data]", article.link)
                 continue
             }
         }
 
         index += 1
-        if (index == 32) break
+        if (index == MAX_ARTICLES) break
     }
     
     console.info("[parseLinkPreviewAndSendResult STOP]")

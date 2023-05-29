@@ -6,7 +6,7 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 
 //const { parseOpmlAndSendFeeds } = require("./main_scripts/parse_opml")
-const { parseLinkPreviewAndSendResult } = require("./main_scripts/parse_link_preview")
+const { parseLinkPreviewAndSendResult } = require("./server_scripts/parse_link_preview")
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/views/main_window.html');
