@@ -1,7 +1,5 @@
-const { getLinkPreview, getPreviewFromContent } = require("link-preview-js");
 const { XMLParser } = require("fast-xml-parser");
 
-const MAX_ARTICLES = 32
 //XML Parser
 const options = {
     ignoreAttributes: false
@@ -16,12 +14,13 @@ async function parseLinkPreviewAndSendResult(link) {
     json = parser.parse(xmlContent)
     articlePreviews = []
     
-    index = 0
     for (const article of json.rss.channel.item) { 
-        articlePreviews.push(article)
-
-        index += 1
-        if (index == MAX_ARTICLES) break
+        console.log(article)
+        articlePreviews.push({
+            "description": article.description,
+            "title": article.title,
+            "link": article.link
+        })
     }
     
     console.info("[parseLinkPreviewAndSendResult STOP]")

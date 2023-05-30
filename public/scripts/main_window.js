@@ -1,6 +1,5 @@
 
 const socket = io()
-import { XMLParser } from "https://cdn.skypack.dev/fast-xml-parser"
 
 function startLoadingScreen(mainWindowContainer) {
     let loader = document.createElement("div")
@@ -36,7 +35,7 @@ function startLoadingScreen(mainWindowContainer) {
     mainWindowContainer.append(loader)
 }
 
-async function triggerChangeFeedSource(feedSourceUrl) {
+function triggerChangeFeedSource(feedSourceUrl) {
 
     document.getElementById("nav-close-button").click()
 
@@ -45,51 +44,44 @@ async function triggerChangeFeedSource(feedSourceUrl) {
     //Cleaning main window
     mainWindowContainer.replaceChildren()
     startLoadingScreen(mainWindowContainer)
-    
-    let res = await fetch(feedSourceUrl, {mode: "no-cors"})
-    let xmlContent = await res.text()
-    let options = {
-        ignoreAttributes: false
-    };
-    let parser = new XMLParser(options);
-    let json = parser.parse(xmlContent)
-    let articlePreviews = []
-    
-    let index = 0
-    for (const article of json.rss.channel.item) { 
-        articlePreviews.push(article)
 
-        index += 1
-        if (index == MAX_ARTICLES) break
-    }
-    
-    console.info("[parseLinkPreviewAndSendResult STOP]")
-    
-    let feedSourcePreviewData = articlePreviews
+    socket.emit("get-feed-items", feedSourceUrl)
 
-    mainWindowContainer.replaceChildren()
+    socket.on("response-get-feed-items", (feedSourcePreviewData) => {
 
-    index = 0
-    let rowDiv = null
-    for (const feedSourceItem of feedSourcePreviewData) {
+        mainWindowContainer.replaceChildren()
 
-        let div = document.createElement("div")
-        div.setAttribute("class", "col-sm-3")
-        div.innerHTML = feedSourceItem.description
+        let index = 0
+        let rowDiv = null
+        for (const feedSourceItem of feedSourcePreviewData) {
 
-        div.addEventListener("click", () => open(feedSourceItem.url))
+            let div = document.createElement("div")
+            div.setAttribute("class", "col-sm-3")
+            div.innerHTML = feedSourceItem.title
+
+            console.log(feedSourceItem.description)
+            let img = new DOMParser().parseFromString(feedSourceItem.description, "text/html").querySelector("img")
+
+            if (img) {
+                img.removeAttribute("width")
+                img.removeAttribute("height")
+                img.removeAttribute("class")
+                div.appendChild(img)
+            }
+
+            div.addEventListener("click", () => open(feedSourceItem.link))
 
 
-        if (index % 4 == 0) {
-            rowDiv = document.createElement("div")
-            rowDiv.setAttribute("class", "row")
-            mainWindowContainer.appendChild(rowDiv)
+            if (index % 4 == 0) {
+                rowDiv = document.createElement("div")
+                rowDiv.setAttribute("class", "row")
+                mainWindowContainer.appendChild(rowDiv)
+            }
+
+            rowDiv.appendChild(div)
+            index += 1
         }
-
-        rowDiv.appendChild(div)
-        index += 1
-    }
-
+    })
 }
 
 function triggerDeleteFeedSource(feedSourceTitle) {
@@ -238,6 +230,7 @@ function deleteFeedFromLocalStorage(feedSourceTitle) {
 }
 
 document.getElementById("main-page").addEventListener("click", setMainPage)
+
 
 setMainPage()
 setNavbarTitles()
