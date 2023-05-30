@@ -14,24 +14,11 @@ async function parseLinkPreviewAndSendResult(link) {
     res = await fetch(link)
     xmlContent = await res.text()
     json = parser.parse(xmlContent)
-    console.log(json.rss.channel.item)
     articlePreviews = []
     
     index = 0
-    for (const article of json.rss.channel.item) {
-        if (article.link.includes("nitter")) {
-            articlePreviews.push({
-                "title" : article.description,
-                "url": article.link
-            })
-        } else {
-            try {
-                articlePreviews.push(await getLinkPreview(article.link))
-            } catch {
-                console.error("[parseLinkPreviewAndSendResult ERROR] [Couldn't retrieve %s preview data]", article.link)
-                continue
-            }
-        }
+    for (const article of json.rss.channel.item) { 
+        articlePreviews.push(article)
 
         index += 1
         if (index == MAX_ARTICLES) break
