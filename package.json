@@ -6,9 +6,9 @@
     "npm": "^9.6.6",
     "node": "^18.16.0"
   },
-  "main": "index.js",
+  "main": "fetchthem.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node fetchthem.js"
   },
   "author": "",
   "license": "ISC",
