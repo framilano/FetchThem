@@ -36,6 +36,7 @@ function startLoadingScreen(mainWindowContainer) {
 }
 
 function triggerChangeFeedSource(feedSourceUrl) {
+    console.debug("[triggerChangeFeedSource START] [feedSourceUrl = %s]", feedSourceUrl)
 
     document.getElementById("nav-close-button").click()
 
@@ -45,6 +46,7 @@ function triggerChangeFeedSource(feedSourceUrl) {
     mainWindowContainer.replaceChildren()
     startLoadingScreen(mainWindowContainer)
 
+    //Asking server to retrieve list of items
     socket.emit("get-feed-items", feedSourceUrl)
 
     socket.on("response-get-feed-items", (feedSourcePreviewData) => {
@@ -57,9 +59,8 @@ function triggerChangeFeedSource(feedSourceUrl) {
 
             let div = document.createElement("div")
             div.setAttribute("class", "col-sm-3")
-            div.innerHTML = feedSourceItem.title
+            div.innerHTML = "<div>" + feedSourceItem.title + "</div>"
 
-            console.log(feedSourceItem.description)
             let img = new DOMParser().parseFromString(feedSourceItem.description, "text/html").querySelector("img")
 
             if (img) {
