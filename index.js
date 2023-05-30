@@ -17,7 +17,6 @@ app.use(express.static('public'));
 io.on('connection', (socket) => {
 
     socket.on("get-preview-data", async (link) => {
-        console.log(link)
         result = await parseLinkPreviewAndSendResult(link)
         socket.emit("send-preview-data", result)
     })

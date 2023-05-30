@@ -7,17 +7,16 @@ const options = {
     ignoreAttributes: false
 };
 const parser = new XMLParser(options);
+
 async function parseLinkPreviewAndSendResult(link) {
     console.debug("[parseLinkPreviewAndSendResult START] [link = %s]", link)
     
-    
-
     res = await fetch(link)
-
     xmlContent = await res.text()
-
     json = parser.parse(xmlContent)
+    console.log(json.rss.channel.item)
     articlePreviews = []
+    
     index = 0
     for (const article of json.rss.channel.item) {
         if (article.link.includes("nitter")) {

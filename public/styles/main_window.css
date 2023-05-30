@@ -18,5 +18,15 @@ body {
 }
 
 a {
-    cursor: pointer
+    cursor: pointer;
+    width: 50%;
+}
+
+.delete-button {
+    float: right;
+}
+
+.title-button {
+    float: left;
+    display: inline;
 }

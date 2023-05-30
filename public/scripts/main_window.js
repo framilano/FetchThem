@@ -87,6 +87,20 @@ function completeChangeFeedSource(feedSourcePreviewData) {
     }
 }
 
+function triggerDeleteFeedSource(feedSourceTitle) {
+    console.log(feedSourceTitle)
+    titlebtns = document.getElementsByClassName("title-button")
+
+    for (const titlebtn of titlebtns) {
+        if (titlebtn.innerText == feedSourceTitle) {
+            //Removing the parent <li> element, deleting both title and del buttons
+            titlebtn.parentElement.remove()
+            deleteFeedFromLocalStorage(feedSourceTitle)
+            return
+        }
+    }
+}
+
 function setNavbarTitles() {
 
     feedsString = localStorage.getItem("feeds")
@@ -102,100 +116,125 @@ function setNavbarTitles() {
     
     for (const feedSource of feedsArray) {
         li = document.createElement("li")
-        a = document.createElement("a")
-        a.innerText = feedSource["title"]
-        a.addEventListener("click", triggerChangeFeedSource.bind(null, feedSource['url']))
-        li.appendChild(a)
+        
+        //Title button
+        titlebtn = document.createElement("button")
+        titlebtn.innerText = feedSource["title"]
+        titlebtn.addEventListener("click", triggerChangeFeedSource.bind(null, feedSource['url']))
+        li.appendChild(titlebtn)
+
+        //Delete button setup
+        deletebtn = document.createElement("button")
+        deletebtn.innerText = "X"
+        deletebtn.addEventListener("click", triggerDeleteFeedSource.bind(null, feedSource["title"]))
+        li.appendChild(deletebtn)
+        
         sourcesList.appendChild(li)
 
         //Classes
         li.setAttribute("class", "nav-item")
-        a.setAttribute("class", "nav-link")
+        titlebtn.setAttribute("class", "nav-link title-button")
+        deletebtn.setAttribute("class", "nav-link delete-button")
     }
 }
-
-socket.on("send-preview-data", (feedSourcePreviewData) => completeChangeFeedSource(feedSourcePreviewData))
-
-document.getElementById("main-page").addEventListener("click", setMainPage)
 
 function setMainPage() {
     mainWindowContainer = document.getElementById("main-window-container")
     //Cleaning main window
     mainWindowContainer.replaceChildren()
-
+    
     mainWindowContainer.innerHTML = `
     <div class="col-auto">
-        <label for="inputRSSTitle" class="visually-hidden">RSS Title</label>
-        <input type="text" class="form-control" id="input-rss-title" placeholder="RSS Title">
+    <label for="inputRSSTitle" class="visually-hidden">RSS Title</label>
+    <input type="text" class="form-control" id="input-rss-title" placeholder="RSS Title">
     </div>
     <div class="col-auto">
-        <label for="inputRSSURL" class="visually-hidden">RSS URL</label>
-        <input type="text" class="form-control" id="input-rss-url" placeholder="RSS URL">
+    <label for="inputRSSURL" class="visually-hidden">RSS URL</label>
+    <input type="text" class="form-control" id="input-rss-url" placeholder="RSS URL">
     </div>
     <div class="col-auto">
-        <button id="save-feed-btn" type="submit" class="btn btn-primary mb-3">Save RSS source</button>
+    <button id="save-feed-btn" type="submit" class="btn btn-primary mb-3">Save RSS source</button>
     </div>
-
+    
     <div class="col-auto">
-        <button id="export-feed-btn" type="submit" class="btn btn-primary mb-3">Export saved feeds</button>
+    <button id="export-feed-btn" type="submit" class="btn btn-primary mb-3">Export saved feeds</button>
     </div>
-
+    
     <div class="mb-3">
-        <label for="formFile" class="form-label">Import feeds.json</label>
-        <input class="form-control" type="file" id="formFile">
+    <label for="formFile" class="form-label">Import feeds.json</label>
+    <input class="form-control" type="file" id="formFile">
     </div>
     `
-
+    
     document.getElementById("save-feed-btn").addEventListener("click", () => {
         url = document.getElementById("input-rss-url").value
         title = document.getElementById("input-rss-title").value
-
+        
         if (!url || !title) return
 
         feedsString = localStorage.getItem("feeds")
-
+        
         feeds_json = []
-
+        
         if (feedsString) {
             feeds_json = JSON.parse(feedsString)
         }
-
+        
         feeds_json.push({ "url": url, "title": title })
-
+        
         localStorage.setItem("feeds", JSON.stringify(feeds_json))
-
+        
         //Updates current NavBar
         setNavbarTitles()
-
+        
     })
-
+    
     document.getElementById("export-feed-btn").addEventListener("click", () => {
-
+        
         feedsString = localStorage.getItem("feeds")
-
+        
         var element = document.createElement('a');
         element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(feedsString));
         element.setAttribute('download', "feeds.json");
-
+        
         element.style.display = 'none';
         document.body.appendChild(element);
-
+        
         element.click();
-
+        
         document.body.removeChild(element);
-
+        
     })
-
+    
     document.getElementById('formFile').addEventListener('change', async (e) => {
         if (e.target.files[0]) {
-          jsonString = await e.target.files[0].text();
-          localStorage.setItem("feeds", jsonString)
-          
-          //Updates current NavBar
-          setNavbarTitles()
+            jsonString = await e.target.files[0].text();
+            localStorage.setItem("feeds", jsonString)
+            
+            //Updates current NavBar
+            setNavbarTitles()
         }
-      });
+    });
 }
+
+function deleteFeedFromLocalStorage(feedSourceTitle) {
+    console.debug("[deleteFeedFromLocalStorage START] [feedSourceTitle = %s]", feedSourceTitle)
+    feeds = localStorage.getItem("feeds")
+    feedsArray = JSON.parse(feeds)
+
+    for (const feed of feedsArray) {
+        if (feed.title == feedSourceTitle) {
+            feedsArray.splice(feedsArray.indexOf(feed), 1)
+            break
+        }
+    }
+
+    localStorage.setItem("feeds", JSON.stringify(feedsArray))
+}
+
+socket.on("send-preview-data", (feedSourcePreviewData) => completeChangeFeedSource(feedSourcePreviewData))
+
+document.getElementById("main-page").addEventListener("click", setMainPage)
 
 setMainPage()
 setNavbarTitles()
