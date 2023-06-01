@@ -15,7 +15,6 @@ async function parseLinkPreviewAndSendResult(link) {
     articlePreviews = []
     
     for (const article of json.rss.channel.item) { 
-        console.log(article)
         articleData = {
             "description": article.description,
             "title": article.title,
