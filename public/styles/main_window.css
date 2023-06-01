@@ -1,25 +1,28 @@
-img {
-    object-fit: cover;
-    max-width: 100%;
-}
-
-.col-sm-3 {
-    cursor: pointer;
-}
-
 body {
     padding-top: 60px;
 }
 
-.row {
-    padding-top:4%;
-    text-align: center;
+img {
+    object-fit: cover;
+    max-width: 100%;
 }
 
 a {
     cursor: pointer;
     width: 50%;
 }
+
+
+.col-sm-3 {
+    cursor: pointer;
+}
+
+
+.row {
+    padding-top: 4%;
+    text-align: center;
+}
+
 
 .delete-button {
     float: right;

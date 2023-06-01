@@ -57,12 +57,20 @@ function triggerChangeFeedSource(feedSourceUrl) {
         let rowDiv = null
         for (const feedSourceItem of feedSourcePreviewData) {
 
+            //Checking if there are empty articles
+            if (feedSourceItem.title.trim().length == 0) {
+                continue
+            }
+
+            //Setting title
             let div = document.createElement("div")
-            div.setAttribute("class", "col-sm-3")
+            div.setAttribute("class", "col-md-3")
             div.innerHTML = "<div>" + feedSourceItem.title + "</div>"
 
-            let img = new DOMParser().parseFromString(feedSourceItem.description, "text/html").querySelector("img")
+            //Extracting image from articleData
+            let img = extractImgFromArticleData(feedSourceItem)
 
+            //Stripping img from its attribute (except src)
             if (img) {
                 img.removeAttribute("width")
                 img.removeAttribute("height")
@@ -70,9 +78,11 @@ function triggerChangeFeedSource(feedSourceUrl) {
                 div.appendChild(img)
             }
 
+            //Adding click event to open the article
             div.addEventListener("click", () => open(feedSourceItem.link))
 
 
+            //Creating a new row every 4 articles
             if (index % 4 == 0) {
                 rowDiv = document.createElement("div")
                 rowDiv.setAttribute("class", "row")
@@ -228,6 +238,36 @@ function deleteFeedFromLocalStorage(feedSourceTitle) {
     }
 
     localStorage.setItem("feeds", JSON.stringify(feedsArray))
+}
+
+function extractImgFromArticleData(feedSourceItem) {
+    //Checking if there's content_encoded in articleData/feedSourceItem
+    let mediaContentImg = null
+    let enclosureImg = null
+    let contentEncodedImg = null
+    let descriptionImg = null
+    
+    if (feedSourceItem['media_content']) {
+        mediaContentImg = document.createElement("img")
+        mediaContentImg.setAttribute("src", feedSourceItem['media_content']["@_url"])
+    }
+
+    if (feedSourceItem['enclosure']) {
+        enclosureImg = document.createElement("img")
+        enclosureImg.setAttribute("src", feedSourceItem['enclosure']["@_url"])
+    }
+
+    if (feedSourceItem['content_encoded']) {
+        contentEncodedImg = new DOMParser().parseFromString(feedSourceItem['content_encoded'], "text/html").querySelector("img")
+    }
+
+    descriptionImg = new DOMParser().parseFromString(feedSourceItem.description, "text/html").querySelector("img")
+    
+    if (mediaContentImg) return mediaContentImg
+    if (enclosureImg) return enclosureImg
+    if (contentEncodedImg) return contentEncodedImg
+    if (descriptionImg) return descriptionImg
+    return null
 }
 
 document.getElementById("main-page").addEventListener("click", setMainPage)

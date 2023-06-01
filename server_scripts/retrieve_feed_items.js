@@ -15,11 +15,17 @@ async function parseLinkPreviewAndSendResult(link) {
     articlePreviews = []
     
     for (const article of json.rss.channel.item) { 
-        articlePreviews.push({
+        console.log(article)
+        articleData = {
             "description": article.description,
             "title": article.title,
             "link": article.link
-        })
+        }
+        
+        if (article['content:encoded']) articleData['content_encoded'] = article['content:encoded']
+        if (article['enclosure']) articleData['enclosure'] = article['enclosure']
+        if (article['media:content']) articleData['media_content'] = article['media:content']
+        articlePreviews.push(articleData)
     }
     
     console.info("[parseLinkPreviewAndSendResult STOP]")
