@@ -56,7 +56,7 @@ function triggerChangeFeedSource(feedSourceUrl) {
         let index = 0
         let rowDiv = null
         for (const feedSourceItem of feedSourcePreviewData) {
-
+            console.log(feedSourceItem)
             //Checking if there are empty articles
             if (feedSourceItem.title.trim().length == 0) {
                 continue
@@ -246,7 +246,12 @@ function extractImgFromArticleData(feedSourceItem) {
     let enclosureImg = null
     let contentEncodedImg = null
     let descriptionImg = null
+    let redditImg = null
     
+    if (feedSourceItem['html_content']) {
+        redditImg = new DOMParser().parseFromString(feedSourceItem['html_content'], "text/html").querySelector("img")
+    }
+
     if (feedSourceItem['media_content']) {
         mediaContentImg = document.createElement("img")
         mediaContentImg.setAttribute("src", feedSourceItem['media_content']["@_url"])
@@ -260,13 +265,15 @@ function extractImgFromArticleData(feedSourceItem) {
     if (feedSourceItem['content_encoded']) {
         contentEncodedImg = new DOMParser().parseFromString(feedSourceItem['content_encoded'], "text/html").querySelector("img")
     }
+    if (feedSourceItem.description) {
+        descriptionImg = new DOMParser().parseFromString(feedSourceItem.description, "text/html").querySelector("img")
+    }
 
-    descriptionImg = new DOMParser().parseFromString(feedSourceItem.description, "text/html").querySelector("img")
-    
     if (mediaContentImg) return mediaContentImg
     if (enclosureImg) return enclosureImg
     if (contentEncodedImg) return contentEncodedImg
     if (descriptionImg) return descriptionImg
+    if (redditImg) return redditImg
     return null
 }
 
