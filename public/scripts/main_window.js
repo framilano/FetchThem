@@ -178,7 +178,20 @@ function setMainPage() {
         let url = document.getElementById("input-rss-url").value
         let title = document.getElementById("input-rss-title").value
 
-        if (!url || !title) return
+        if (!url.match("https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)")) {
+            alert("Invalid URL")
+            return
+        }
+
+        if (title.length > 15) {
+            alert("Title is too long")
+            return
+        }
+
+        if (!url || !title) {
+            alert("Invalid URL or Title")
+            return
+        }
 
         let feedsString = localStorage.getItem("feeds")
 
@@ -247,7 +260,7 @@ function extractImgFromArticleData(feedSourceItem) {
     let contentEncodedImg = null
     let descriptionImg = null
     let redditImg = null
-    
+
     if (feedSourceItem['html_content']) {
         redditImg = new DOMParser().parseFromString(feedSourceItem['html_content'], "text/html").querySelector("img")
     }

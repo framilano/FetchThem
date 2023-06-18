@@ -3,8 +3,10 @@ body {
 }
 
 img {
-    object-fit: cover;
-    max-width: 100%;
+    max-width: 400px;
+    max-height: 320px;
+    width: auto;
+    height: auto;
 }
 
 a {
